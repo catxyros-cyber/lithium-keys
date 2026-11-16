@@ -1,0 +1,32 @@
+name: process license requests
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  process:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: process bind / reset issues
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 process.py
+
+      - name: commit registry updates
+        run: |
+          git config user.name "lithium-license-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add keys.json
+          if git diff --cached --quiet; then
+            echo "no registry changes"
+          else
+            git commit -m "process license requests"
+            git push
+          fi
