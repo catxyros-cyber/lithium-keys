@@ -1,5 +1,7 @@
 name: process license requests
 on:
+  issues:
+    types: [opened, reopened]
   schedule:
     - cron: "*/5 * * * *"
   workflow_dispatch:
